@@ -10,10 +10,10 @@ import {
   RefreshControl,
   StatusBar,
 } from "react-native";
-import { useAppDispatch, useAppSelector } from "../store/hook";
-import { logout } from "../store/slices/authSlice";
-import { fetchUserTasks, setCurrentTask } from "../store/slices/taskSlice";
-import { Task, TaskStatus } from "../types/task";
+import { useAppDispatch, useAppSelector } from "../../store/hook";
+import { logout } from "../../store/slices/authSlice";
+import { fetchUserTasks, setCurrentTask } from "../../store/slices/taskSlice";
+import { Task, TaskStatus } from "../../types/task";
 import { Ionicons } from "@expo/vector-icons";
 
 const TaskListScreen: React.FC = ({ navigation }: any) => {
@@ -236,7 +236,7 @@ const TaskListScreen: React.FC = ({ navigation }: any) => {
   if (isLoading && !refreshing && tasks.length === 0) {
     return (
       <View style={styles.centerContainer}>
-        <StatusBar barStyle="dark-content" backgroundColor="#f8fafc" />
+        <StatusBar barStyle="dark-content" />
         <ActivityIndicator size="large" color="#6366f1" />
         <Text style={styles.loadingText}>Loading your tasks...</Text>
       </View>
@@ -245,7 +245,7 @@ const TaskListScreen: React.FC = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <StatusBar barStyle="dark-content"/>
 
       <View style={styles.header}>
         <View style={styles.headerContent}>
@@ -350,7 +350,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f8fafc",
     padding: 20,
   },
   loadingText: {

@@ -4,23 +4,23 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import ProjectListScreen from '../screens/ProjectListScreen';
-import ProjectDetailsScreen from '../screens/ProjectDetailsScreen';
-import TaskListScreen from '../screens/TaskListScreen';
-import TaskDetailsScreen from '../screens/TaskDetailsScreen';
-import CreateTaskScreen from '../screens/CreateTaskScreen';
-import CreateProjectScreen from '../screens/CreateProjectScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import { Ionicons } from '@expo/vector-icons';
-import { 
-  RootStackParamList, 
+import LoginScreen from "../screens/Auth/LoginScreen";
+import RegisterScreen from "../screens/Auth/RegisterScreen";
+import ProjectListScreen from "../screens/Project/ProjectListScreen";
+import ProjectDetailsScreen from "../screens/Project/ProjectDetailsScreen";
+import TaskListScreen from "../screens/Task/TaskListScreen";
+import TaskDetailsScreen from "../screens/Task/TaskDetailsScreen";
+import CreateTaskScreen from "../screens/Task/CreateTaskScreen";
+import CreateProjectScreen from "../screens/Project/CreateProjectScreen";
+import ProfileScreen from "../screens/Profile/ProfileScreen";
+import { Ionicons } from "@expo/vector-icons";
+import {
+  RootStackParamList,
   MainTabParamList,
   TasksStackParamList,
   ProjectsStackParamList,
-  CreateStackParamList 
-} from '../types/navigation';
+  CreateStackParamList,
+} from "../types/navigation";
 
 const RootStack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -34,41 +34,40 @@ function TasksStackNavigator() {
     <TasksStack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#ffffff',
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: "#f1f5f9",
         },
-        headerTintColor: '#1e293b',
+        headerTintColor: "#1e293b",
         headerTitleStyle: {
-          fontWeight: '700',
+          fontWeight: "700",
           fontSize: 18,
         },
-        headerBackTitle: 'Back',
-        headerTitleAlign: 'center',
+        headerBackTitle: "Back",
+        headerTitleAlign: "center",
       }}
     >
-      <TasksStack.Screen 
-        name="TaskList" 
+      <TasksStack.Screen
+        name="TaskList"
         component={TaskListScreen}
-        options={{ 
-          title: 'My Tasks',
+        options={{
+          title: "My Tasks",
           headerLeft: () => null,
         }}
       />
-      <TasksStack.Screen 
-        name="TaskDetails" 
+      <TasksStack.Screen
+        name="TaskDetails"
         component={TaskDetailsScreen}
-        options={{ 
-          title: 'Task Details',
+        options={{
+          title: "Task Details",
         }}
       />
-      <TasksStack.Screen 
-        name="CreateTask" 
+      <TasksStack.Screen
+        name="CreateTask"
         component={CreateTaskScreen}
-        options={{ 
-          title: 'Create Task',
+        options={{
+          title: "Create Task",
         }}
       />
     </TasksStack.Navigator>
@@ -81,41 +80,40 @@ function ProjectsStackNavigator() {
     <ProjectsStack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#ffffff',
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: "#f1f5f9",
         },
-        headerTintColor: '#1e293b',
+        headerTintColor: "#1e293b",
         headerTitleStyle: {
-          fontWeight: '700',
+          fontWeight: "700",
           fontSize: 18,
         },
-        headerBackTitle: 'Back',
-        headerTitleAlign: 'center',
+        headerBackTitle: "Back",
+        headerTitleAlign: "center",
       }}
     >
-      <ProjectsStack.Screen 
-        name="ProjectList" 
+      <ProjectsStack.Screen
+        name="ProjectList"
         component={ProjectListScreen}
-        options={{ 
-          title: 'Projects',
+        options={{
+          title: "Projects",
           headerLeft: () => null,
         }}
       />
-      <ProjectsStack.Screen 
-        name="ProjectDetails" 
+      <ProjectsStack.Screen
+        name="ProjectDetails"
         component={ProjectDetailsScreen}
-        options={{ 
-          title: 'Project Details',
+        options={{
+          title: "Project Details",
         }}
       />
-      <ProjectsStack.Screen 
-        name="CreateProject" 
+      <ProjectsStack.Screen
+        name="CreateProject"
         component={CreateProjectScreen}
-        options={{ 
-          title: 'Create Project',
+        options={{
+          title: "Create Project",
         }}
       />
     </ProjectsStack.Navigator>

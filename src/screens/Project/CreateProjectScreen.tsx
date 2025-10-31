@@ -10,11 +10,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store';
-import { useAppDispatch, useAppSelector } from '../store/hook';
-import Input from '../components/Input';
-import Button from '../components/Button';
-import { createProject } from '../store/slices/projectSlice';
+import { RootState } from '../../store';
+import { useAppDispatch, useAppSelector } from '../../store/hook';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import { createProject } from '../../store/slices/projectSlice';
 import { Ionicons } from '@expo/vector-icons';
 
 const CreateProjectScreen: React.FC = () => {
@@ -263,7 +263,7 @@ const CreateProjectScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#ffffff',
   },
   scrollContent: {
     flexGrow: 1,

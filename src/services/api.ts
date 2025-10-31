@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { LoginCredentials, RegisterCredentials, AuthResponse } from '../types/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from 'react-native';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'http://192.168.1.112:3000/api';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -17,6 +18,22 @@ api.interceptors.request.use(async (config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const status = error.response?.status;
+    const message = error.response?.data?.message?.toLowerCase?.();
+
+    if (status === 401 && (message?.includes('jwt') || message?.includes('unauthorized'))) {
+      Alert.alert('Session Expired', 'Your session has expired. Please log in again.');
+
+      await AsyncStorage.removeItem('accessToken');
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export const authAPI = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {

@@ -12,7 +12,7 @@ class SocketService {
 
     this.accessToken = token;
     
-    const SOCKET_URL = 'http://localhost:3000';
+    const SOCKET_URL = 'http://192.168.1.112:3000';
     
     this.socket = io(SOCKET_URL, {
       auth: {

@@ -9,9 +9,9 @@ import {
   RefreshControl,
   StatusBar,
 } from 'react-native';
-import { useAppDispatch, useAppSelector } from '../store/hook';
-import { fetchProjects, setCurrentProject } from '../store/slices/projectSlice';
-import { Project } from '../types/project';
+import { useAppDispatch, useAppSelector } from '../../store/hook';
+import { fetchProjects, setCurrentProject } from '../../store/slices/projectSlice';
+import { Project } from '../../types/project';
 import { Ionicons } from '@expo/vector-icons';
 
 const ProjectListScreen: React.FC = ({ navigation }: any) => {
@@ -121,7 +121,7 @@ const ProjectListScreen: React.FC = ({ navigation }: any) => {
   if (isLoading && !refreshing && projects.length === 0) {
     return (
       <View style={styles.centerContainer}>
-        <StatusBar barStyle="dark-content" backgroundColor="#f8fafc" />
+        <StatusBar barStyle="dark-content"/>
         <ActivityIndicator size="large" color="#6366f1" />
         <Text style={styles.loadingText}>Loading your projects...</Text>
       </View>
@@ -130,7 +130,7 @@ const ProjectListScreen: React.FC = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <StatusBar barStyle="dark-content"/>
       
       <View style={styles.header}>
         <View style={styles.headerContent}>
@@ -202,7 +202,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8fafc',
     padding: 20,
   },
   loadingText: {
@@ -218,9 +217,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 10,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
   },
   headerContent: {
     flex: 1,

@@ -9,13 +9,13 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import { useAppDispatch, useAppSelector } from '../store/hook';
-import Input from '../components/Input';
-import Button from '../components/Button';
+import { useAppDispatch, useAppSelector } from '../../store/hook';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
 import { Picker } from '@react-native-picker/picker';
-import { createTask } from '../store/slices/taskSlice';
-import { fetchProjects } from '../store/slices/projectSlice';
-import { TaskStatus } from '../types/task';
+import { createTask } from '../../store/slices/taskSlice';
+import { fetchProjects } from '../../store/slices/projectSlice';
+import { TaskStatus } from '../../types/task';
 import { Ionicons } from '@expo/vector-icons';
 
 const CreateTaskScreen: React.FC = ({ navigation }: any) => {

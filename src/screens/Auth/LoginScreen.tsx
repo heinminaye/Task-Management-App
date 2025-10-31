@@ -10,11 +10,11 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { login, clearError } from '../store/slices/authSlice';
-import { RootState, AppDispatch } from '../store';
-import { RootStackParamList } from '../types/navigation';
-import Input from '../components/Input';
-import Button from '../components/Button';
+import { login, clearError } from '../../store/slices/authSlice';
+import { RootState, AppDispatch } from '../../store';
+import { RootStackParamList } from '../../types/navigation';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
