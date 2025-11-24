@@ -1,62 +1,81 @@
+// components/Input.tsx
 import React, { useState } from 'react';
 import {
-  TextInput,
-  Text,
   View,
+  Text,
+  TextInput,
   StyleSheet,
-  TextInputProps,
   TouchableOpacity,
+  TextInputProps,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface InputProps extends TextInputProps {
-  label?: string;
+  label: string;
   error?: string;
   isPassword?: boolean;
+  icon?: string;
+  containerStyle?: any;
 }
 
-const Input: React.FC<InputProps> = ({ 
-  label, 
-  error, 
-  style, 
+const Input: React.FC<InputProps> = ({
+  label,
+  error,
   isPassword = false,
-  ...props 
+  icon,
+  containerStyle,
+  ...props
 }) => {
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(!isPassword);
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
   return (
-    <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      <View style={styles.inputContainer}>
+    <View style={[styles.container, containerStyle]}>
+      <Text style={styles.label}>{label}</Text>
+      <View style={[
+        styles.inputContainer,
+        error ? styles.inputError : styles.inputNormal,
+      ]}>
+        {icon && (
+          <Ionicons 
+            name={icon as any} 
+            size={20} 
+            color={error ? '#dc2626' : '#64748b'} 
+            style={styles.icon}
+          />
+        )}
         <TextInput
           style={[
             styles.input,
-            error && styles.inputError,
-            isPassword && styles.inputWithIcon,
-            style,
+            icon && styles.inputWithIcon,
+            isPassword && styles.inputWithButton,
           ]}
-          placeholderTextColor="#9ca3af"
           secureTextEntry={isPassword && !isPasswordVisible}
+          placeholderTextColor="#94a3b8"
           {...props}
         />
         {isPassword && (
           <TouchableOpacity
-            style={styles.eyeIcon}
             onPress={togglePasswordVisibility}
+            style={styles.visibilityButton}
           >
             <Ionicons
-              name={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'}
-              size={24}
-              color="#6b7280"
+              name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color="#64748b"
             />
           </TouchableOpacity>
         )}
       </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && (
+        <View style={styles.errorContainer}>
+          <Ionicons name="alert-circle-outline" size={16} color="#dc2626" />
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -67,41 +86,52 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 8,
+    fontWeight: '600',
     color: '#374151',
+    marginBottom: 8,
   },
   inputContainer: {
-    position: 'relative',
-  },
-  input: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#e5e7eb',
     borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    backgroundColor: '#fff',
-    color: '#111827',
+    backgroundColor: '#ffffff',
   },
-  inputWithIcon: {
-    paddingRight: 50,
+  inputNormal: {
+    borderColor: '#e2e8f0',
   },
   inputError: {
-    borderColor: '#ef4444',
+    borderColor: '#dc2626',
   },
-  eyeIcon: {
-    position: 'absolute',
-    right: 16,
-    top: 0,
-    height: '100%',
-    justifyContent: 'center',
+  icon: {
+    marginLeft: 16,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: '#1e293b',
+  },
+  inputWithIcon: {
+    paddingLeft: 12,
+  },
+  inputWithButton: {
+    paddingRight: 12,
+  },
+  visibilityButton: {
+    padding: 16,
+  },
+  errorContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
+    marginTop: 8,
+    gap: 4,
   },
   errorText: {
-    color: '#ef4444',
-    fontSize: 12,
-    marginTop: 4,
+    color: '#dc2626',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

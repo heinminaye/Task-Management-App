@@ -14,6 +14,7 @@ interface AuthState {
   accessToken: string | null;
   isLoading: boolean;
   error: string | null;
+  pendingConfirmationEmail: string | null;
 }
 
 const initialState: AuthState = {
@@ -21,6 +22,7 @@ const initialState: AuthState = {
   accessToken: null,
   isLoading: false,
   error: null,
+  pendingConfirmationEmail: null,
 };
 
 export const login = createAsyncThunk(
@@ -30,7 +32,30 @@ export const login = createAsyncThunk(
       const response = await authAPI.login(credentials);
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Login failed");
+      const data = error.response?.data;
+      let errorMessage = "Login failed";
+
+      if (data) {
+        if (Array.isArray(data.message)) {
+          errorMessage = data.message.join(", ");
+        } else if (typeof data.message === "string") {
+          errorMessage = data.message;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      if (errorMessage.includes("Account pending admin confirmation")) {
+        return rejectWithValue({
+          message: errorMessage,
+          type: "CONFIRMATION_REQUIRED",
+          email: credentials.email,
+        });
+      }
+
+      return rejectWithValue({
+        message: errorMessage,
+        type: "LOGIN_ERROR",
+      });
     }
   }
 );
@@ -40,11 +65,12 @@ export const register = createAsyncThunk(
   async (credentials: RegisterCredentials, { rejectWithValue }) => {
     try {
       const response = await authAPI.register(credentials);
-      return response;
+      return { ...response, email: credentials.email };
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Registration failed"
-      );
+      return rejectWithValue({
+        message: error.response?.data?.message || "Registration failed",
+        type: "REGISTRATION_ERROR",
+      });
     }
   }
 );
@@ -85,11 +111,17 @@ const authSlice = createSlice({
       state.user = null;
       state.accessToken = null;
       state.error = null;
-      // Clear token from storage
+      state.pendingConfirmationEmail = null;
       AsyncStorage.removeItem("accessToken");
     },
     clearError: (state) => {
       state.error = null;
+    },
+    setPendingConfirmationEmail: (state, action: PayloadAction<string>) => {
+      state.pendingConfirmationEmail = action.payload;
+    },
+    clearPendingConfirmation: (state) => {
+      state.pendingConfirmationEmail = null;
     },
     setCredentials: (
       state,
@@ -117,8 +149,8 @@ const authSlice = createSlice({
           state.isLoading = false;
           state.user = action.payload.user;
           state.accessToken = action.payload.accessToken;
+          state.pendingConfirmationEmail = null;
 
-          // Store token in AsyncStorage
           if (action.payload.accessToken) {
             AsyncStorage.setItem("accessToken", action.payload.accessToken);
           }
@@ -126,8 +158,15 @@ const authSlice = createSlice({
       )
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
-        // Clear token on login failure
+        const errorPayload = action.payload as any;
+
+        if (errorPayload?.type === "CONFIRMATION_REQUIRED") {
+          state.pendingConfirmationEmail = errorPayload.email;
+          state.error = errorPayload.message;
+        } else {
+          state.error = errorPayload?.message || "Login failed";
+        }
+
         AsyncStorage.removeItem("accessToken");
       })
       // Register
@@ -135,12 +174,16 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(register.fulfilled, (state) => {
+      .addCase(register.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.pendingConfirmationEmail = action.payload.email;
+        state.error = null;
       })
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        const errorPayload = action.payload as any;
+        state.error = errorPayload?.message || "Registration failed";
+        state.pendingConfirmationEmail = null;
       })
       // Check Token
       .addCase(checkAuthToken.fulfilled, (state, action) => {
@@ -165,5 +208,12 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError, setCredentials, updateUser } = authSlice.actions;
+export const {
+  logout,
+  clearError,
+  setCredentials,
+  updateUser,
+  setPendingConfirmationEmail,
+  clearPendingConfirmation,
+} = authSlice.actions;
 export default authSlice.reducer;

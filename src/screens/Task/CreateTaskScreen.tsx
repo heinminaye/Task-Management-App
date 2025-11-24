@@ -8,6 +8,7 @@ import {
   Platform,
   Alert,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
 import Input from '../../components/Input';
@@ -37,8 +38,15 @@ const CreateTaskScreen: React.FC = ({ navigation }: any) => {
     projectId: '',
     dueDate: '',
   });
+  const [fadeAnim] = useState(new Animated.Value(0));
 
   useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+    
     dispatch(fetchProjects());
   }, [dispatch]);
 
@@ -84,7 +92,7 @@ const CreateTaskScreen: React.FC = ({ navigation }: any) => {
       await dispatch(createTask(taskData)).unwrap();
       
       Alert.alert(
-        'Success',
+        'Success 🎉',
         'Task created successfully!',
         [
           {
@@ -115,7 +123,7 @@ const CreateTaskScreen: React.FC = ({ navigation }: any) => {
   };
 
   const handleCreateProject = () => {
-    navigation.navigate('CreateProjectBy');
+    navigation.navigate('CreateProject');
   };
 
   const getPriorityLabel = (priority: number) => {
@@ -124,6 +132,15 @@ const CreateTaskScreen: React.FC = ({ navigation }: any) => {
       case 1: return 'Medium';
       case 2: return 'High';
       default: return 'Medium';
+    }
+  };
+
+  const getPriorityColor = (priority: number) => {
+    switch (priority) {
+      case 0: return '#10b981';
+      case 1: return '#f59e0b';
+      case 2: return '#ef4444';
+      default: return '#f59e0b';
     }
   };
 
@@ -138,160 +155,241 @@ const CreateTaskScreen: React.FC = ({ navigation }: any) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.content}>
-          {/* Quick Project Creation */}
+        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+
+          {/* No Projects Banner */}
           {projects.length === 0 && (
             <View style={styles.noProjectsBanner}>
-              <Ionicons name="warning-outline" size={24} color="#f59e0b" />
-              <View style={styles.noProjectsText}>
-                <Text style={styles.noProjectsTitle}>No Projects Found</Text>
-                <Text style={styles.noProjectsSubtitle}>
-                  You need to create a project first before adding tasks
+              <View style={styles.bannerIcon}>
+                <Ionicons name="warning" size={24} color="#f59e0b" />
+              </View>
+              <View style={styles.bannerContent}>
+                <Text style={styles.bannerTitle}>No Projects Found</Text>
+                <Text style={styles.bannerSubtitle}>
+                  Create a project first to organize your tasks
                 </Text>
               </View>
               <TouchableOpacity 
                 style={styles.createProjectButton}
                 onPress={handleCreateProject}
               >
-                <Ionicons name="add" size={16} color="#fff" />
-                <Text style={styles.createProjectButtonText}>Create Project</Text>
+                <Ionicons name="add" size={18} color="#fff" />
+                <Text style={styles.createProjectButtonText}>New Project</Text>
               </TouchableOpacity>
             </View>
           )}
 
-          <Input
-            label="Task Title *"
-            placeholder="Enter task title"
-            value={formData.title}
-            onChangeText={(text) => setFormData({ ...formData, title: text })}
-            error={formErrors.title}
-          />
-
-          <Input
-            label="Description"
-            placeholder="Enter task description"
-            value={formData.description}
-            onChangeText={(text) => setFormData({ ...formData, description: text })}
-            multiline
-            numberOfLines={4}
-            style={styles.textArea}
-          />
-
-          {/* Project Selection */}
-          <View style={styles.pickerContainer}>
-            <View style={styles.pickerHeader}>
-              <Text style={styles.label}>Project *</Text>
-              <TouchableOpacity 
-                style={styles.createProjectLink}
-                onPress={handleCreateProject}
-              >
-                <Ionicons name="add" size={16} color="#6366f1" />
-                <Text style={styles.createProjectLinkText}>New Project</Text>
-              </TouchableOpacity>
+          {/* Task Details Card */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="create" size={20} color="#6366f1" />
+              <Text style={styles.cardTitle}>Task Details</Text>
             </View>
-            <View style={[
-              styles.picker,
-              formErrors.projectId && styles.pickerError
-            ]}>
-              <Picker
-                selectedValue={formData.projectId}
-                onValueChange={(value) => setFormData({ ...formData, projectId: value })}
-                enabled={!projectsLoading && projects.length > 0}
-              >
-                <Picker.Item label="Select a project" value="" />
-                {projects.map((project: any) => (
-                  <Picker.Item 
-                    key={project.id} 
-                    label={project.name} 
-                    value={project.id} 
-                  />
+
+            <Input
+              label="Task Title *"
+              placeholder="What needs to be done?"
+              value={formData.title}
+              onChangeText={(text) => setFormData({ ...formData, title: text })}
+              error={formErrors.title}
+              icon="text"
+            />
+
+            <Input
+              label="Description"
+              placeholder="Add details about this task..."
+              value={formData.description}
+              onChangeText={(text) => setFormData({ ...formData, description: text })}
+              multiline
+              numberOfLines={4}
+              style={styles.textArea}
+              icon="document-text-outline"
+            />
+          </View>
+
+          {/* Project & Settings Card */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="settings" size={20} color="#6366f1" />
+              <Text style={styles.cardTitle}>Task Settings</Text>
+            </View>
+
+            {/* Project Selection */}
+            <View style={styles.fieldContainer}>
+              <View style={styles.fieldHeader}>
+                <Text style={styles.label}>Project *</Text>
+                <TouchableOpacity 
+                  style={styles.createProjectLink}
+                  onPress={handleCreateProject}
+                >
+                  <Ionicons name="add-circle" size={16} color="#6366f1" />
+                  <Text style={styles.createProjectLinkText}>New Project</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={[
+                styles.pickerWrapper,
+                formErrors.projectId && styles.pickerError
+              ]}>
+                <Picker
+                  selectedValue={formData.projectId}
+                  onValueChange={(value) => setFormData({ ...formData, projectId: value })}
+                  enabled={!projectsLoading && projects.length > 0}
+                >
+                  <Picker.Item label="Select a project" value="" />
+                  {projects.map((project: any) => (
+                    <Picker.Item 
+                      key={project.id} 
+                      label={project.name} 
+                      value={project.id} 
+                    />
+                  ))}
+                </Picker>
+              </View>
+              {formErrors.projectId ? (
+                <Text style={styles.errorText}>{formErrors.projectId}</Text>
+              ) : null}
+            </View>
+
+            {/* Priority Selection */}
+            <View style={styles.fieldContainer}>
+              <Text style={styles.label}>Priority</Text>
+              <View style={styles.priorityButtons}>
+                {[
+                  { value: 0, label: 'Low', color: '#10b981' },
+                  { value: 1, label: 'Medium', color: '#f59e0b' },
+                  { value: 2, label: 'High', color: '#ef4444' },
+                ].map((priority) => (
+                  <TouchableOpacity
+                    key={priority.value}
+                    style={[
+                      styles.priorityButton,
+                      formData.priority === priority.value && [
+                        styles.priorityButtonActive,
+                        { backgroundColor: priority.color + '20', borderColor: priority.color }
+                      ]
+                    ]}
+                    onPress={() => setFormData({ ...formData, priority: priority.value as 0 | 1 | 2 })}
+                  >
+                    <View style={[styles.priorityDot, { backgroundColor: priority.color }]} />
+                    <Text style={[
+                      styles.priorityButtonText,
+                      formData.priority === priority.value && { color: priority.color }
+                    ]}>
+                      {priority.label}
+                    </Text>
+                  </TouchableOpacity>
                 ))}
-              </Picker>
+              </View>
             </View>
-            {formErrors.projectId ? (
-              <Text style={styles.errorText}>{formErrors.projectId}</Text>
-            ) : null}
-          </View>
 
-          {/* Priority Selection */}
-          <View style={styles.pickerContainer}>
-            <Text style={styles.label}>Priority</Text>
-            <View style={styles.picker}>
-              <Picker
-                selectedValue={formData.priority}
-                onValueChange={(value) => setFormData({ ...formData, priority: value })}
-              >
-                <Picker.Item label="Low" value={0} />
-                <Picker.Item label="Medium" value={1} />
-                <Picker.Item label="High" value={2} />
-              </Picker>
+            {/* Due Date */}
+            <View style={styles.fieldContainer}>
+              <Input
+                label="Due Date *"
+                placeholder="YYYY-MM-DD"
+                value={formData.dueDate}
+                onChangeText={(text) => setFormData({ ...formData, dueDate: text })}
+                error={formErrors.dueDate}
+                icon="calendar"
+              />
             </View>
-          </View>
 
-          {/* Due Date */}
-          <Input
-            label="Due Date *"
-            placeholder="YYYY-MM-DD"
-            value={formData.dueDate}
-            onChangeText={(text) => setFormData({ ...formData, dueDate: text })}
-            error={formErrors.dueDate}
-          />
-
-          {/* Assigned To (Optional) */}
-          <View style={styles.pickerContainer}>
-            <Text style={styles.label}>Assign To (Optional)</Text>
-            <View style={styles.picker}>
-              <Picker
-                selectedValue={formData.assignedTo}
-                onValueChange={(value) => setFormData({ ...formData, assignedTo: value })}
-              >
-                <Picker.Item label="Unassigned" value="" />
-                <Picker.Item label="Myself" value={user?.id || ''} />
-              </Picker>
+            {/* Assigned To */}
+            <View style={styles.fieldContainer}>
+              <Text style={styles.label}>Assign To (Optional)</Text>
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={formData.assignedTo}
+                  onValueChange={(value) => setFormData({ ...formData, assignedTo: value })}
+                >
+                  <Picker.Item label="Unassigned" value="" />
+                  <Picker.Item label="Assign to myself" value={user?.id || ''} />
+                </Picker>
+              </View>
             </View>
           </View>
 
-          <View style={styles.formSummary}>
-            <Text style={styles.summaryTitle}>Task Summary:</Text>
-            <Text style={styles.summaryText}>
-              • Title: {formData.title || 'Not set'}
-            </Text>
-            <Text style={styles.summaryText}>
-              • Project: {projects.find((p: any) => p.id === formData.projectId)?.name || 'Not selected'}
-            </Text>
-            <Text style={styles.summaryText}>
-              • Priority: {getPriorityLabel(formData.priority)}
-            </Text>
-            <Text style={styles.summaryText}>
-              • Due Date: {formData.dueDate || 'Not set'}
-            </Text>
+          {/* Quick Summary Card */}
+          <View style={styles.summaryCard}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="eye" size={20} color="#6366f1" />
+              <Text style={styles.cardTitle}>Quick Preview</Text>
+            </View>
+            <View style={styles.summaryContent}>
+              <View style={styles.summaryRow}>
+                <Ionicons name="text" size={16} color="#64748b" />
+                <Text style={styles.summaryLabel}>Title</Text>
+                <Text style={styles.summaryValue} numberOfLines={1}>
+                  {formData.title || 'Not set'}
+                </Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Ionicons name="folder" size={16} color="#64748b" />
+                <Text style={styles.summaryLabel}>Project</Text>
+                <Text style={styles.summaryValue}>
+                  {projects.find((p: any) => p.id === formData.projectId)?.name || 'Not selected'}
+                </Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Ionicons name="flag" size={16} color="#64748b" />
+                <Text style={styles.summaryLabel}>Priority</Text>
+                <View style={styles.priorityBadge}>
+                  <View 
+                    style={[
+                      styles.priorityIndicator,
+                      { backgroundColor: getPriorityColor(formData.priority) }
+                    ]} 
+                  />
+                  <Text style={styles.summaryValue}>
+                    {getPriorityLabel(formData.priority)}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.summaryRow}>
+                <Ionicons name="calendar" size={16} color="#64748b" />
+                <Text style={styles.summaryLabel}>Due Date</Text>
+                <Text style={styles.summaryValue}>
+                  {formData.dueDate || 'Not set'}
+                </Text>
+              </View>
+            </View>
           </View>
 
-          <Button
-            title="Create Task"
-            onPress={handleSubmit}
-            loading={isLoading}
-            style={styles.button}
-          />
+          {/* Action Buttons */}
+          <View style={styles.actions}>
+            <Button
+              title="Create Task"
+              onPress={handleSubmit}
+              loading={isLoading}
+              style={styles.createButton}
+            />
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={resetForm}
+              disabled={isLoading}
+            >
+              <Text style={styles.cancelButtonText}>Clear Form</Text>
+            </TouchableOpacity>
+          </View>
 
           <Text style={styles.note}>
             * Required fields
           </Text>
-        </View>
+        </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8fafc',
   },
   scrollContent: {
     flexGrow: 1,
   },
   content: {
-    flex: 1,
     padding: 16,
   },
   noProjectsBanner: {
@@ -300,22 +398,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffbeb',
     borderColor: '#fef3c7',
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     gap: 12,
   },
-  noProjectsText: {
+  bannerIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#fef3c7',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bannerContent: {
     flex: 1,
   },
-  noProjectsTitle: {
-    fontSize: 14,
+  bannerTitle: {
+    fontSize: 16,
     fontWeight: '600',
     color: '#92400e',
     marginBottom: 2,
   },
-  noProjectsSubtitle: {
-    fontSize: 12,
+  bannerSubtitle: {
+    fontSize: 14,
     color: '#b45309',
   },
   createProjectButton: {
@@ -323,19 +429,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#6366f1',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
   },
   createProjectButtonText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
   },
-  pickerContainer: {
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     marginBottom: 16,
   },
-  pickerHeader: {
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e293b',
+  },
+  fieldContainer: {
+    marginBottom: 20,
+  },
+  fieldHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -345,7 +475,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#374151',
-    marginBottom: 8,
   },
   createProjectLink: {
     flexDirection: 'row',
@@ -358,10 +487,10 @@ const styles = StyleSheet.create({
     color: '#6366f1',
     fontWeight: '500',
   },
-  picker: {
+  pickerWrapper: {
     borderWidth: 1,
     borderColor: '#d1d5db',
-    borderRadius: 8,
+    borderRadius: 12,
     backgroundColor: '#fff',
     overflow: 'hidden',
   },
@@ -369,10 +498,8 @@ const styles = StyleSheet.create({
     borderColor: '#ef4444',
   },
   textArea: {
-    minHeight: 100,
+    height: 100,
     textAlignVertical: 'top',
-    paddingTop: 12,
-    paddingBottom: 12,
   },
   errorText: {
     color: '#ef4444',
@@ -380,34 +507,98 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginLeft: 4,
   },
-  formSummary: {
-    backgroundColor: '#f8fafc',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
+  priorityButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  priorityButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    padding: 12,
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    backgroundColor: '#f9fafb',
+  },
+  priorityButtonActive: {
+    borderWidth: 2,
+  },
+  priorityDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  priorityButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6b7280',
+  },
+  summaryCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  summaryContent: {
+    gap: 12,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 12,
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+    minWidth: 80,
+  },
+  summaryValue: {
+    fontSize: 14,
+    color: '#64748b',
+    flex: 1,
+  },
+  priorityBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  priorityIndicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  actions: {
+    gap: 12,
+    marginBottom: 16,
+  },
+  createButton: {
     marginTop: 8,
   },
-  summaryTitle: {
+  cancelButton: {
+    padding: 16,
+    alignItems: 'center',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    backgroundColor: '#ffffff',
+  },
+  cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#374151',
-    marginBottom: 8,
-  },
-  summaryText: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 4,
-  },
-  button: {
-    marginBottom: 16,
+    color: '#64748b',
   },
   note: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: '#94a3b8',
     textAlign: 'center',
-    fontStyle: 'italic',
   },
 });
 

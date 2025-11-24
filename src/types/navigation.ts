@@ -1,10 +1,14 @@
 export type RootStackParamList = {
   Login: undefined;
-  Register: undefined;
+  Register: {
+    initialStep?: number;
+    email?: string;
+  };
   Main: undefined;
   ProjectDetails: { projectId: string };
   TaskDetails: { taskId: string };
   CreateProject: undefined;
+  UserManagement: undefined;
 };
 
 export type MainTabParamList = {
@@ -12,6 +16,7 @@ export type MainTabParamList = {
   Tasks: undefined;
   Create: undefined;
   Profile: undefined;
+  Admin: undefined;
 };
 
 export type TasksStackParamList = {

@@ -3,6 +3,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import authReducer from './slices/authSlice';
 import projectReducer from './slices/projectSlice';
+import adminReducer from './slices/adminSlice'
 import taskReducer from './slices/taskSlice';
 
 const persistConfig = {
@@ -18,6 +19,7 @@ export const store = configureStore({
     auth: persistedAuthReducer,
     projects: projectReducer,
     tasks: taskReducer,
+    admin: adminReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -1,9 +1,9 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 import LoginScreen from "../screens/Auth/LoginScreen";
 import RegisterScreen from "../screens/Auth/RegisterScreen";
 import ProjectListScreen from "../screens/Project/ProjectListScreen";
@@ -21,6 +21,7 @@ import {
   ProjectsStackParamList,
   CreateStackParamList,
 } from "../types/navigation";
+import UserManagementScreen from "../screens/User/UserManagementScreen";
 
 const RootStack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -120,32 +121,51 @@ function ProjectsStackNavigator() {
   );
 }
 
+// Admin Stack Navigator with loading state
+function AdminStackNavigator() {
+  return (
+    <RootStack.Navigator>
+      <RootStack.Screen 
+        name="UserManagement" 
+        component={UserManagementScreen}
+        options={{
+          headerShown: false
+        }}
+      />
+    </RootStack.Navigator>
+  );
+}
 
 function MainTabs() {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const isAdmin = user?.isAdmin;
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap;
 
-          if (route.name === 'Projects') {
-            iconName = focused ? 'folder' : 'folder-outline';
-          } else if (route.name === 'Tasks') {
-            iconName = focused ? 'list' : 'list-outline';
-          } else if (route.name === 'Profile') {
-            iconName = focused ? 'person' : 'person-outline';
+          if (route.name === "Projects") {
+            iconName = focused ? "folder" : "folder-outline";
+          } else if (route.name === "Tasks") {
+            iconName = focused ? "list" : "list-outline";
+          } else if (route.name === "Profile") {
+            iconName = focused ? "person" : "person-outline";
+          } else if (route.name === "Admin") {
+            iconName = focused ? "shield" : "shield-outline";
           } else {
-            iconName = 'help-outline';
+            iconName = "help-outline";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#6366f1',
-        tabBarInactiveTintColor: '#64748b',
+        tabBarActiveTintColor: "#6366f1",
+        tabBarInactiveTintColor: "#64748b",
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#ffffff',
-          borderTopColor: '#e2e8f0',
+          backgroundColor: "#ffffff",
+          borderTopColor: "#e2e8f0",
           borderTopWidth: 1,
           height: 60,
           paddingBottom: 8,
@@ -153,34 +173,52 @@ function MainTabs() {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '600',
+          fontWeight: "600",
         },
       })}
     >
-      <Tab.Screen 
-        name="Projects" 
+      <Tab.Screen
+        name="Projects"
         component={ProjectsStackNavigator}
-        options={{ 
-          title: 'Projects',
+        options={{
+          title: "Projects",
         }}
       />
-      <Tab.Screen 
-        name="Tasks" 
+      <Tab.Screen
+        name="Tasks"
         component={TasksStackNavigator}
-        options={{ 
-          title: 'Tasks',
+        options={{
+          title: "Tasks",
         }}
       />
-      <Tab.Screen 
-        name="Profile" 
+      {/* Conditionally show Admin tab only for admin users */}
+      {isAdmin && (
+        <Tab.Screen
+          name="Admin"
+          component={AdminStackNavigator}
+          options={{
+            title: "Admin",
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons
+                name={focused ? "shield" : "shield-outline"}
+                size={size}
+                color={color}
+              />
+            ),
+          }}
+        />
+      )}
+      <Tab.Screen
+        name="Profile"
         component={ProfileScreen}
-        options={{ 
-          title: 'Profile',
+        options={{
+          title: "Profile",
         }}
       />
     </Tab.Navigator>
   );
 }
+
 export default function AppNavigator() {
   const { accessToken } = useSelector((state: RootState) => state.auth);
 

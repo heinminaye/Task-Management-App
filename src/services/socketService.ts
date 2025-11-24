@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
 import { Notification } from '../types/socket';
+import { Config } from 'react-native-config';
 
 class SocketService {
   private socket: ReturnType<typeof io> | null = null;
@@ -12,7 +13,7 @@ class SocketService {
 
     this.accessToken = token;
     
-    const SOCKET_URL = 'http://192.168.1.112:3000';
+    const SOCKET_URL = 'https://task-management-backend-production-16bf.up.railway.app';
     
     this.socket = io(SOCKET_URL, {
       auth: {

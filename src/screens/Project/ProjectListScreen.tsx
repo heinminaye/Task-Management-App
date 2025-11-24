@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { fetchProjects, setCurrentProject } from '../../store/slices/projectSlice';
@@ -28,7 +29,7 @@ const ProjectListScreen: React.FC = ({ navigation }: any) => {
     try {
       await dispatch(fetchProjects()).unwrap();
     } catch (error) {
-      console.log('Failed to load projects');
+      Alert.alert("Error", "Failed to load projects.");
     }
   };
 

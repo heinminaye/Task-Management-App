@@ -20,8 +20,10 @@ const ProfileScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    loadUserProfile();
-  }, [dispatch]);
+    if (user) {
+      loadUserProfile();
+    }
+  }, []);
 
   useEffect(() => {
     if (error) {

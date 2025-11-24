@@ -44,9 +44,7 @@ export const useSocket = () => {
 
       // Set up notification listener
       socketService.onNotification((notification) => {
-        // You can show toast notifications here
         console.log('New notification:', notification);
-        // You can integrate with a toast library like react-native-toast-message
       });
     }
 

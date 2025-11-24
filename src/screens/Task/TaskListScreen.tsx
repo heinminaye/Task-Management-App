@@ -11,7 +11,6 @@ import {
   StatusBar,
 } from "react-native";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
-import { logout } from "../../store/slices/authSlice";
 import { fetchUserTasks, setCurrentTask } from "../../store/slices/taskSlice";
 import { Task, TaskStatus } from "../../types/task";
 import { Ionicons } from "@expo/vector-icons";
